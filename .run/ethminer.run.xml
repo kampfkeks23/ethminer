@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ethminer" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" EXPLICIT_BUILD_TARGET_NAME="all">
+  <configuration default="false" name="ethminer" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--metal -P stratum1+tcp://0xaebea5c4acc773eaea7b73fd4618967baf8efc20@eth-eu1.nanopool.org:9999/test/testMiner" REDIRECT_INPUT="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ethminer" TARGET_NAME="ethminer" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ethminer" RUN_TARGET_NAME="ethminer">
     <method v="2">
       <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
     </method>

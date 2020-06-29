@@ -61,7 +61,8 @@ enum class MinerType
     Mixed,
     CL,
     CUDA,
-    CPU
+    CPU,
+    METAL
 };
 
 enum class HwMonitorInfoType
@@ -110,6 +111,11 @@ struct CLSettings : public MinerSettings
     unsigned globalWorkSize = 0;
     unsigned globalWorkSizeMultiplier = 65536;
     unsigned localWorkSize = 128;
+};
+
+struct MTSettings : public MinerSettings
+{
+
 };
 
 // Holds settings for CPU Miner

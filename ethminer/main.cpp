@@ -34,6 +34,9 @@
 #if ETH_ETHASHCPU
 #include <libethash-cpu/CPUMiner.h>
 #endif
+#if ETH_ETHASHMETAL
+#include <libethash-metal/MetalMiner.h>
+#endif
 #include <libpoolprotocols/PoolManager.h>
 
 #if API_CORE
@@ -235,6 +238,9 @@ public:
 #if ETH_ETHASHCPU
                     "cp",
 #endif
+#if ETH_HASHMETAL
+                    "metal",
+#endif
 #if API_CORE
                     "api",
 #endif
@@ -304,7 +310,7 @@ public:
 
 #endif
 
-#if ETH_ETHASHCL || ETH_ETHASHCUDA || ETH_ETHASH_CPU
+#if ETH_ETHASHCL || ETH_ETHASHCUDA || ETH_ETHASH_CPU || ETH_ETHASHMETAL
 
         app.add_flag("--list-devices", m_shouldListDevices, "");
 
@@ -349,6 +355,12 @@ public:
 
 #endif
 
+#if ETH_HASHMETAL
+
+        app.add_option("--metal-devices,--mt-devices", m_MTSettings.devices, "");
+
+#endif
+
         app.add_flag("--noeval", m_FarmSettings.noEval, "");
 
         app.add_option("-L,--dag-load-mode", m_FarmSettings.dagLoadMode, "", true)->check(CLI::Range(1));
@@ -358,6 +370,9 @@ public:
 
         bool cuda_miner = false;
         app.add_flag("-U,--cuda", cuda_miner, "");
+
+        bool metal_miner = false;
+        app.add_flag("-T,--metal", metal_miner, "");
 
         bool cpu_miner = false;
 #if ETH_ETHASHCPU
@@ -406,6 +421,8 @@ public:
             m_minerType = MinerType::CL;
         else if (cuda_miner)
             m_minerType = MinerType::CUDA;
+        else if(metal_miner)
+            m_minerType = MinerType::METAL;
         else if (cpu_miner)
             m_minerType = MinerType::CPU;
         else
@@ -515,6 +532,10 @@ public:
 #if ETH_ETHASHCPU
         if (m_minerType == MinerType::CPU)
             CPUMiner::enumDevices(m_DevicesCollection);
+#endif
+#if ETH_ETHASHMETAL
+        if (m_minerType == MinerType::METAL)
+            MetalMiner::enumDevices(m_DevicesCollection);
 #endif
 
         // Can't proceed without any GPU
@@ -1266,6 +1287,7 @@ private:
     CLSettings m_CLSettings;          // Operating settings for CL Miners
     CUSettings m_CUSettings;          // Operating settings for CUDA Miners
     CPSettings m_CPSettings;          // Operating settings for CPU Miners
+    MTSettings m_MTSettings;          // Operating settings for MetalMiner
 
     //// -- Pool manager related params
     //std::vector<std::shared_ptr<URI>> m_poolConns;

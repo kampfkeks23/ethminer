@@ -276,6 +276,7 @@ private:
     CUSettings m_CUSettings;  // Cuda settings passed to CUDA Miner instantiator
     CLSettings m_CLSettings;  // OpenCL settings passed to CL Miner instantiator
     CPSettings m_CPSettings;  // CPU settings passed to CPU Miner instantiator
+    MTSettings m_MTSettings;  // Metal settings passed to Metal Miner
 
     boost::asio::io_service::strand m_io_strand;
     boost::asio::deadline_timer m_collectTimer;

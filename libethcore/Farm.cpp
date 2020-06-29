@@ -29,6 +29,9 @@
 #if ETH_ETHASHCPU
 #include <libethash-cpu/CPUMiner.h>
 #endif
+#if ETH_ETHASHMETAL
+#include <libethash-metal/MetalMiner.h>
+#endif
 
 namespace dev
 {
@@ -268,6 +271,14 @@ bool Farm::start()
                 minerTelemetry.prefix = "cu";
                 m_miners.push_back(std::shared_ptr<Miner>(
                     new CUDAMiner(m_miners.size(), m_CUSettings, it->second)));
+            }
+#endif
+#if ETH_ETHASHMETAL
+            if (it->second.subscriptionType == DeviceSubscriptionTypeEnum::Cuda)
+            {
+                minerTelemetry.prefix = "cu";
+                m_miners.push_back(std::shared_ptr<Miner>(
+                    new MetalMiner(m_miners.size(), m_MTSettings, it->second)));
             }
 #endif
 #if ETH_ETHASHCL
