@@ -747,6 +747,16 @@ public:
             }
         }
 #endif
+#if ETH_ETHASHMETAL
+        if (!m_MTSettings.devices.size() &&
+            (m_minerType == MinerType::METAL))
+        {
+            for (auto it = m_DevicesCollection.begin(); it != m_DevicesCollection.end(); it++)
+            {
+                it->second.subscriptionType = DeviceSubscriptionTypeEnum::Metal;
+            }
+        }
+#endif
         // Count of subscribed devices
         int subscribedDevices = 0;
         for (auto it = m_DevicesCollection.begin(); it != m_DevicesCollection.end(); it++)

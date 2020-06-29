@@ -40,7 +40,7 @@ along with ethminer.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #include "MetalMiner.h"
-
+#include <cmt/cmt.h>
 
 /* Sanity check for defined OS */
 #if defined(__APPLE__) || defined(__MACOSX)
@@ -122,50 +122,15 @@ static size_t getTotalPhysAvailableMemory()
  */
 unsigned MetalMiner::getNumDevices()
 {
-#if 0
-    static unsigned cpus = 0;
-
-    if (cpus == 0)
-    {
-        std::vector< boost::fibers::numa::node > topo = boost::fibers::numa::topology();
-        for (auto n : topo) {
-            cpus += n.logical_cpus.size();
-        }
-    }
-    return cpus;
-#elif defined(__APPLE__) || defined(__MACOSX)
-    unsigned int cpus_available = std::thread::hardware_concurrency();
-    if (cpus_available <= 0)
-    {
-        cwarn << "Error in func " << __FUNCTION__ << " at std::thread::hardware_concurrency \""
-              << cpus_available << " were found." << "\"\n";
-        return 0;
-    }
-    return cpus_available;
-
-#elif defined(__linux__)
-    long cpus_available;
-    cpus_available = sysconf(_SC_NPROCESSORS_ONLN);
-    if (cpus_available == -1L)
-    {
-        cwarn << "Error in func " << __FUNCTION__ << " at sysconf(_SC_NPROCESSORS_ONLN) \""
-              << strerror(errno) << "\"\n";
-        return 0;
-    }
-    return cpus_available;
-#else
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-    return sysinfo.dwNumberOfProcessors;
-#endif
+    return 1;
 }
 
 
-/* ######################## CPU Miner ######################## */
+/* ######################## Metal Miner ######################## */
 
 struct MetalMinerChannel : public LogChannel
 {
-    static const char* name() { return EthOrange "cp"; }
+    static const char* name() { return EthOrange "metal"; }
     static const int verbosity = 2;
 };
 #define cpulog clog(CPUChannel)
@@ -221,46 +186,6 @@ void MetalMiner::kick_miner()
     m_new_work.store(true, std::memory_order_relaxed);
     m_new_work_signal.notify_one();
 }
-
-
-void MetalMiner::search(const dev::eth::WorkPackage& w)
-{
-    constexpr size_t blocksize = 30;
-
-    const auto& context = ethash::get_global_epoch_context_full(w.epoch);
-    const auto header = ethash::hash256_from_bytes(w.header.data());
-    const auto boundary = ethash::hash256_from_bytes(w.boundary.data());
-    auto nonce = w.startNonce;
-
-    while (true)
-    {
-        if (m_new_work.load(std::memory_order_relaxed))  // new work arrived ?
-        {
-            m_new_work.store(false, std::memory_order_relaxed);
-            break;
-        }
-
-        if (shouldStop())
-            break;
-
-
-        auto r = ethash::search(context, header, boundary, nonce, blocksize);
-        if (r.solution_found)
-        {
-            h256 mix{reinterpret_cast<byte*>(r.mix_hash.bytes), h256::ConstructFromPointer};
-            auto sol = Solution{r.nonce, mix, w, std::chrono::steady_clock::now(), m_index};
-
-            std::cout << EthWhite << "Job: " << w.header.abridged()
-                   << " Sol: " << toHex(sol.nonce, HexPrefix::Add) << EthReset;
-            Farm::f().submitProof(sol);
-        }
-        nonce += blocksize;
-
-        // Update the hash rate
-        updateHashRate(blocksize, 1);
-    }
-}
-
 
 /*
  * The main work loop of a Worker thread
@@ -319,6 +244,9 @@ void MetalMiner::workLoop()
     DEV_BUILD_LOG_PROGRAMFLOW(cpulog, "cp-" << m_index << " MetalMiner::workLoop() end");
 }
 
+void MetalMiner::search(const dev::eth::WorkPackage& w) {
+
+}
 
 void MetalMiner::enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollection)
 {

@@ -52,7 +52,8 @@ enum class DeviceSubscriptionTypeEnum
     None,
     OpenCL,
     Cuda,
-    Cpu
+    Cpu,
+    Metal
 
 };
 
